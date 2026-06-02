@@ -1,32 +1,30 @@
-name: Indian Law RAG Assistant
+name: Run Indian Law Assistant
 
 on:
   workflow_dispatch:
     inputs:
-      model:
-        description: 'OpenAI Model to use'
-        required: false
-        default: 'gpt-3.5-turbo'
       environment:
-        description: 'Environment'
+        description: 'Environment to run in'
         required: false
         default: 'production'
 
 jobs:
-  run-indian-law-assistant:
+  run-streamlit:
     runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v4
     
-    - name: Set up Python 3.11
+    - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: '3.11'
     
-    - name: Cache Python dependencies
-      uses: actions/cache@v3
+    - name: Cache pip dependencies
+      uses: actions/cache@v4
       with:
         path: ~/.cache/pip
         key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
@@ -38,37 +36,19 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
     
-    - name: Verify project structure
-      run: |
-        echo "Checking project files..."
-        ls -la
-        echo "Checking law documents..."
-        ls -la "law documents/"
-    
-    - name: Create environment file
+    - name: Create .env file
       run: |
         echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" > .env
-        echo ".env file created successfully"
     
-    - name: Validate JSON documents
+    - name: Verify files exist
       run: |
-        echo "Validating JSON files..."
-        python -c "
-        import json
-        files = ['law documents/constitution_qa.json', 'law documents/ipc_qa.json', 'law documents/crpc_qa.json']
-        for f in files:
-            with open(f) as file:
-                data = json.load(file)
-                print(f'{f}: {len(data)} Q&A pairs')
-        "
+        ls -la
+        ls -la "law documents/"
     
-    - name: Run Indian Law Assistant
+    - name: Run Streamlit app
       run: |
-        streamlit run Indian_law.py \
-          --logger.level=debug \
-          --client.showErrorDetails=true
+        streamlit run Indian_law.py --logger.level=debug
       env:
         OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         STREAMLIT_SERVER_HEADLESS: true
         STREAMLIT_SERVER_PORT: 8501
-        STREAMLIT_SERVER_RUNONCESAVE: false
