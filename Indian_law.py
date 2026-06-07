@@ -14,16 +14,8 @@ from operator import itemgetter
 # Load environment variables
 load_dotenv()
 
-# Initialize OpenAI API
-st.title("⚖️ Indian Law Assistant")
-st.subheader(
-    "Understanding Indian Constitution, IPC, and CrPC in Simple Terms")
-with st.sidebar:
-    st.title("provide your API key")
-    api_key = st.text_input("enter Api key", type="password")
-if not api_key:
-    st.info("Enter your Api key to continue")
-    st.stop()
+# API key placeholder; populated in main after page config is set.
+api_key = None
 
 
 def load_json_documents(file_path: str, source_name: str) -> list:
@@ -204,6 +196,15 @@ def initialize_streamlit_ui():
 def main():
     """Main Streamlit application."""
     initialize_streamlit_ui()
+
+    global api_key
+    with st.sidebar:
+        st.title("Provide your API key")
+        api_key = st.text_input("Enter API key", type="password")
+
+    if not api_key:
+        st.info("Enter your API key to continue")
+        st.stop()
 
     # Initialize session state
     if "vector_store" not in st.session_state:
