@@ -15,9 +15,15 @@ from operator import itemgetter
 load_dotenv()
 
 # Initialize OpenAI API
-api_key = os.getenv("OPENAI_API_KEY")
+st.title("⚖️ Indian Law Assistant")
+st.subheader(
+    "Understanding Indian Constitution, IPC, and CrPC in Simple Terms")
+with st.sidebar:
+    st.title("provide your API key")
+    api_key = st.text_input("enter Api key", type="password")
 if not api_key:
-    raise ValueError("OPENAI_API_KEY not set in environment variables")
+    st.info("Enter your Api key to continue")
+    st.stop()
 
 
 def load_json_documents(file_path: str, source_name: str) -> list:
@@ -185,10 +191,6 @@ def initialize_streamlit_ui():
         layout="wide",
         initial_sidebar_state="expanded"
     )
-
-    st.title("⚖️ Indian Law Assistant")
-    st.subheader(
-        "Understanding Indian Constitution, IPC, and CrPC in Simple Terms")
 
     st.markdown("""
     This AI-powered legal assistant helps you understand Indian laws in everyday language.
